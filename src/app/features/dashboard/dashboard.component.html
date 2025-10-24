@@ -1,0 +1,48 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">Contents Generator</h1>
+      <div class="user-info" *ngIf="currentUser$ | async as user">
+        <span class="user-name">Hoş geldiniz, {{ user.firstName || user.username }}!</span>
+        <button class="logout-btn" (click)="logout()">Çıkış Yap</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="welcome-section">
+      <h2>İçerik Üretici Dashboard</h2>
+      <p>Burada içerik üretimi, video oluşturma ve iş akışlarınızı yönetebilirsiniz.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>İçerik Üretimi</h3>
+        <p>AI destekli metin ve görsel içerik oluşturun</p>
+        <button class="feature-btn">Başla</button>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎥</div>
+        <h3>Video Oluşturucu</h3>
+        <p>Dinamik videolar oluşturun ve düzenleyin</p>
+        <button class="feature-btn">Başla</button>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>İş Akışları</h3>
+        <p>Workflow'larınızı tasarlayın ve yönetin</p>
+        <button class="feature-btn">Başla</button>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⏰</div>
+        <h3>Zamanlanmış Görevler</h3>
+        <p>Otomatik çalışacak görevlerinizi planlayın</p>
+        <button class="feature-btn">Başla</button>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,162 @@
+.popup-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.popup {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid;
+  animation: slideIn 0.3s ease-out;
+  overflow: hidden;
+}
+
+.popup-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  gap: 12px;
+}
+
+.popup-icon {
+  font-size: 20px;
+  font-weight: bold;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.popup-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.popup-title {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.popup-message {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #666;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #333;
+  }
+}
+
+// Type-specific styles
+.popup-success {
+  border-left-color: #10b981;
+  
+  .popup-icon {
+    background: #10b981;
+    color: white;
+  }
+  
+  .popup-title {
+    color: #065f46;
+  }
+}
+
+.popup-error {
+  border-left-color: #ef4444;
+  
+  .popup-icon {
+    background: #ef4444;
+    color: white;
+  }
+  
+  .popup-title {
+    color: #991b1b;
+  }
+}
+
+.popup-warning {
+  border-left-color: #f59e0b;
+  
+  .popup-icon {
+    background: #f59e0b;
+    color: white;
+  }
+  
+  .popup-title {
+    color: #92400e;
+  }
+}
+
+.popup-info {
+  border-left-color: #3b82f6;
+  
+  .popup-icon {
+    background: #3b82f6;
+    color: white;
+  }
+  
+  .popup-title {
+    color: #1e40af;
+  }
+}
+
+// Animations
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .popup-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+  
+  .popup {
+    border-radius: 6px;
+  }
+  
+  .popup-content {
+    padding: 12px;
+  }
+}

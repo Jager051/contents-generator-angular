@@ -1,0 +1,25 @@
+<div class="popup-container" *ngIf="(popups$ | async)?.length">
+  <div 
+    *ngFor="let popup of popups$ | async; trackBy: trackByPopup"
+    class="popup"
+    [ngClass]="getPopupClass(popup.type)"
+  >
+    <div class="popup-content">
+      <div class="popup-icon">
+        {{ getIconClass(popup.type) }}
+      </div>
+      <div class="popup-body">
+        <h4 class="popup-title" *ngIf="popup.title">{{ popup.title }}</h4>
+        <p class="popup-message">{{ popup.message }}</p>
+      </div>
+      <button 
+        *ngIf="popup.showCloseButton"
+        class="popup-close"
+        (click)="closePopup(popup)"
+        aria-label="Kapat"
+      >
+        ×
+      </button>
+    </div>
+  </div>
+</div>
