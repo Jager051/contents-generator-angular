@@ -1,0 +1,51 @@
+<section class="view">
+  <header class="view__header">
+    <div>
+      <h2>Telegram Integration</h2>
+      <p>Connect your Telegram bot for notifications and approvals.</p>
+    </div>
+  </header>
+
+  <div class="telegram-layout">
+    <div class="card telegram-card">
+      <header class="telegram-card__header">
+        <div class="telegram-card__icon">
+          <mat-icon>send</mat-icon>
+        </div>
+        <div>
+          <h3>Connection Status</h3>
+          <p class="success">
+            <mat-icon>check_circle</mat-icon>
+            Connected
+          </p>
+        </div>
+      </header>
+
+      <div class="telegram-card__body">
+        <label class="field">
+          <span>Bot Token</span>
+          <input [(ngModel)]="botToken" type="password" placeholder="Enter your Telegram bot token" />
+        </label>
+
+        <label class="field">
+          <span>Chat ID</span>
+          <input [(ngModel)]="chatId" type="text" placeholder="Your Telegram chat ID" />
+        </label>
+
+        <button type="button" class="btn btn-gradient w-100">Update Connection</button>
+      </div>
+    </div>
+
+    <div class="card instructions-card gradient-card">
+      <h3>How to Connect</h3>
+      <ol>
+        <li>Open Telegram and search for @BotFather.</li>
+        <li>Create a new bot using /newbot command.</li>
+        <li>Copy your bot token and paste it above.</li>
+        <li>Get your chat ID from @userinfobot.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+

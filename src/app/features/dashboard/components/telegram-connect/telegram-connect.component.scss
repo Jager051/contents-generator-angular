@@ -1,0 +1,138 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 32px;
+}
+
+.view__header {
+  h2 {
+    margin: 0;
+    font-size: 30px;
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  p {
+    margin-top: 6px;
+    font-size: 16px;
+    color: #64748b;
+  }
+}
+
+.telegram-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+}
+
+.telegram-card {
+  padding: 28px;
+}
+
+.telegram-card__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .success {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #16a34a;
+    margin: 0;
+  }
+}
+
+.telegram-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #3b82f6, #22d3ee);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 28px;
+  box-shadow: 0 18px 30px rgba(59, 130, 246, 0.25);
+}
+
+.telegram-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  span {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  input {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    font-size: 14px;
+    background: rgba(248, 250, 252, 0.8);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+
+    &:focus {
+      outline: none;
+      border-color: rgba(59, 130, 246, 0.6);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    }
+  }
+}
+
+.instructions-card {
+  padding: 28px;
+  color: white;
+
+  h3 {
+    margin: 0 0 16px;
+    font-size: 18px;
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 14px;
+    opacity: 0.95;
+  }
+}
+
+.w-100 {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .telegram-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .view {
+    padding: 20px;
+  }
+}
+
+

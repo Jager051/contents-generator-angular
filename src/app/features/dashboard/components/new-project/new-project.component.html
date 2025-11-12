@@ -1,0 +1,134 @@
+<div class="modal-backdrop">
+  <div class="modal card">
+    <header class="modal__header">
+      <div>
+        <h2>Create New Project</h2>
+        <p>Step {{ currentStep + 1 }} of {{ steps.length }} · {{ steps[currentStep].title }}</p>
+      </div>
+      <button type="button" class="btn btn-ghost" (click)="handleClose()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <div class="progress">
+      <div
+        *ngFor="let step of steps; index as index"
+        class="progress__step"
+        [class.progress__step--active]="index <= currentStep"
+      >
+        <span>{{ index + 1 }}</span>
+        <label>{{ step.title }}</label>
+      </div>
+    </div>
+
+    <div class="modal__content">
+      <ng-container [ngSwitch]="currentStep">
+        <form *ngSwitchCase="0" class="form-grid">
+          <label class="field span-2">
+            <span>Project Name</span>
+            <input [(ngModel)]="draft.name" name="project-name" type="text" placeholder="Daily Motivation Videos" />
+          </label>
+
+          <div class="field span-2">
+            <span>Content Frequency</span>
+            <div class="pill-group">
+              <button
+                type="button"
+                *ngFor="let option of frequencyOptions"
+                class="pill"
+                [class.pill--selected]="draft.frequency === option"
+                (click)="setFrequency(option)"
+              >
+                {{ option | titlecase }}
+              </button>
+            </div>
+          </div>
+
+          <label class="field span-2">
+            <span>Topic or Theme Description</span>
+            <textarea
+              [(ngModel)]="draft.description"
+              name="project-description"
+              rows="4"
+              placeholder="Describe what your videos will be about."
+            ></textarea>
+          </label>
+        </form>
+
+        <form *ngSwitchCase="1" class="form-grid">
+          <div class="field span-2">
+            <span>Trigger Type</span>
+            <div class="pill-group">
+              <button
+                type="button"
+                *ngFor="let option of triggerOptions"
+                class="pill"
+                [class.pill--selected]="draft.triggerType === option"
+                (click)="setTriggerType(option)"
+              >
+                {{ option | titlecase }}
+              </button>
+            </div>
+          </div>
+
+          <label class="field">
+            <span>Trigger Time</span>
+            <input [(ngModel)]="draft.triggerTime" name="trigger-time" type="time" />
+          </label>
+
+          <label class="field">
+            <span>Language</span>
+            <input [(ngModel)]="draft.language" name="language" type="text" />
+          </label>
+
+          <div class="field toggle span-2">
+            <div>
+              <p>Auto-Publish Videos</p>
+              <small>Send directly to connected platforms after approval.</small>
+            </div>
+            <mat-slide-toggle [(ngModel)]="draft.autoPublish" name="auto-publish"></mat-slide-toggle>
+          </div>
+        </form>
+
+        <div *ngSwitchCase="2" class="review">
+          <h3>Review Summary</h3>
+          <div class="review__grid">
+            <div>
+              <h4>Project Basics</h4>
+              <p><strong>Name:</strong> {{ draft.name || 'Not set' }}</p>
+              <p><strong>Frequency:</strong> {{ draft.frequency | titlecase }}</p>
+              <p><strong>Language:</strong> {{ draft.language }}</p>
+            </div>
+            <div>
+              <h4>Triggers</h4>
+              <p><strong>Type:</strong> {{ draft.triggerType | titlecase }}</p>
+              <p><strong>Time:</strong> {{ draft.triggerTime }}</p>
+              <p><strong>Auto Publish:</strong> {{ draft.autoPublish ? 'Enabled' : 'Disabled' }}</p>
+            </div>
+            <div class="span-2">
+              <h4>Description</h4>
+              <p class="muted">{{ draft.description || 'No description provided yet.' }}</p>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <footer class="modal__footer">
+      <button type="button" class="btn btn-outline" (click)="previousStep()" [disabled]="currentStep === 0">
+        <mat-icon>chevron_left</mat-icon>
+        Back
+      </button>
+
+      <div class="modal__actions">
+        <button type="button" class="btn btn-outline" (click)="handleClose()">Save as Draft</button>
+        <button type="button" class="btn btn-gradient" (click)="isLastStep ? submit() : nextStep()">
+          {{ isLastStep ? 'Create Project' : 'Next' }}
+          <mat-icon *ngIf="!isLastStep">chevron_right</mat-icon>
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+

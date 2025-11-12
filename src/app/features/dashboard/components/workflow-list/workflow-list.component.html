@@ -1,0 +1,142 @@
+<section class="view">
+  <header class="view__header">
+    <div>
+      <h2>Workflow List</h2>
+      <p>Manage all your automation workflows.</p>
+    </div>
+    <button type="button" class="btn btn-gradient" (click)="triggerNewWorkflow()">
+      <mat-icon>add</mat-icon>
+      New Workflow
+    </button>
+  </header>
+
+  <div class="stats-grid">
+    <div class="card stats-card">
+      <div class="stats-card__content">
+        <p>Total Workflows</p>
+        <span>{{ workflows.length }}</span>
+      </div>
+      <div class="stats-card__icon stats-card__icon--blue">
+        <mat-icon>play_circle</mat-icon>
+      </div>
+    </div>
+
+    <div class="card stats-card">
+      <div class="stats-card__content">
+        <p>Active</p>
+        <span>{{ countByStatus('active') }}</span>
+      </div>
+      <div class="stats-card__icon stats-card__icon--green">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+    </div>
+
+    <div class="card stats-card">
+      <div class="stats-card__content">
+        <p>Paused</p>
+        <span>{{ countByStatus('paused') }}</span>
+      </div>
+      <div class="stats-card__icon stats-card__icon--yellow">
+        <mat-icon>pause_circle</mat-icon>
+      </div>
+    </div>
+
+    <div class="card stats-card">
+      <div class="stats-card__content">
+        <p>Errors</p>
+        <span>{{ countByStatus('error') }}</span>
+      </div>
+      <div class="stats-card__icon stats-card__icon--red">
+        <mat-icon>error</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <mat-icon>search</mat-icon>
+    <input
+      type="search"
+      placeholder="Search workflows..."
+      [(ngModel)]="searchQuery"
+    />
+  </div>
+
+  <div class="card table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Workflow Name</th>
+            <th>Status</th>
+            <th>Frequency</th>
+            <th>Trigger</th>
+            <th>Videos Created</th>
+            <th>Next Run</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let workflow of filteredWorkflows">
+            <td>
+              <div class="workflow-cell">
+                <div class="workflow-cell__icon">
+                  <mat-icon>play_arrow</mat-icon>
+                </div>
+                <div>
+                  <p>{{ workflow.name }}</p>
+                  <small>ID: {{ workflow.id }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge badge-outline" [ngClass]="statusClass(workflow.status)">
+                <mat-icon>{{ statusIcon(workflow.status) }}</mat-icon>
+                <span class="capitalize">{{ workflow.status }}</span>
+              </span>
+            </td>
+            <td>
+              <span class="badge badge-outline capitalize">{{ workflow.frequency }}</span>
+            </td>
+            <td>
+              <div class="trigger-cell">
+                <mat-icon>schedule</mat-icon>
+                {{ workflow.trigger }}
+              </div>
+            </td>
+            <td>
+              <span class="strong">{{ workflow.videosCreated }}</span>
+            </td>
+            <td>
+              <span class="muted">{{ workflow.nextRun }}</span>
+            </td>
+            <td>
+              <div class="actions">
+                <button type="button" class="btn btn-ghost">
+                  <mat-icon>{{ workflow.status === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
+                </button>
+                <button type="button" class="btn btn-ghost">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button type="button" class="btn btn-ghost">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button type="button" class="btn btn-ghost danger">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button type="button" class="btn btn-ghost">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p *ngIf="filteredWorkflows.length === 0" class="empty-state">
+    No workflows found matching “{{ searchQuery }}”.
+  </p>
+</section>
+
+

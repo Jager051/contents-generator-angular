@@ -1,0 +1,72 @@
+<section class="view">
+  <header class="view__header">
+    <div>
+      <h2>Published Videos</h2>
+      <p>View your content history and analytics.</p>
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="card stats-card">
+      <div class="stats-card__icon stats-card__icon--blue">
+        <mat-icon>smart_display</mat-icon>
+      </div>
+      <div class="stats-card__content">
+        <p>Total Videos</p>
+        <span>48</span>
+      </div>
+    </div>
+
+    <div class="card stats-card">
+      <div class="stats-card__icon stats-card__icon--green">
+        <mat-icon>visibility</mat-icon>
+      </div>
+      <div class="stats-card__content">
+        <p>Total Views</p>
+        <span>285K</span>
+      </div>
+    </div>
+
+    <div class="card stats-card">
+      <div class="stats-card__icon stats-card__icon--yellow">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+      <div class="stats-card__content">
+        <p>Avg. Growth</p>
+        <span>+24%</span>
+      </div>
+    </div>
+
+    <div class="card stats-card">
+      <div class="stats-card__icon stats-card__icon--purple">
+        <mat-icon>subscriptions</mat-icon>
+      </div>
+      <div class="stats-card__content">
+        <p>Platforms</p>
+        <span>2</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="video-grid">
+    <article *ngFor="let video of videos" class="card video-card">
+      <div class="video-card__thumbnail" [ngClass]="'video-card__thumbnail--' + video.thumbnail">
+        <mat-icon>smart_display</mat-icon>
+        <span class="badge badge-solid">{{ video.platform }}</span>
+      </div>
+      <div class="video-card__content">
+        <h3>{{ video.title }}</h3>
+        <div class="video-card__meta">
+          <span>{{ video.publishedAt }}</span>
+          <span class="views">
+            <mat-icon>visibility</mat-icon>
+            {{ video.views }}
+          </span>
+        </div>
+        <button type="button" class="btn btn-outline w-100">View Details</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+

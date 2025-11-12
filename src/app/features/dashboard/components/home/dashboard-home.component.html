@@ -1,0 +1,16 @@
+<section class="dashboard-home">
+  <header class="dashboard-home__header">
+    <div>
+      <h2>Welcome back!</h2>
+      <p>Let's create amazing content today.</p>
+    </div>
+    <app-dashboard-quick-actions (newProject)="handleNewProject()"></app-dashboard-quick-actions>
+  </header>
+
+  <div class="dashboard-home__grid">
+    <app-workflow-stepper class="dashboard-home__workflow"></app-workflow-stepper>
+    <app-preview-panel class="dashboard-home__preview"></app-preview-panel>
+  </div>
+</section>
+
+

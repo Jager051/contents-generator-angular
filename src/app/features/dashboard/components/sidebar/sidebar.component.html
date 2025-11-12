@@ -1,0 +1,33 @@
+<aside class="sidebar">
+  <div class="sidebar__brand">
+    <div class="sidebar__logo">
+      <mat-icon fontIcon="auto_awesome"></mat-icon>
+    </div>
+    <div>
+      <h1>AI Video Bot</h1>
+      <p>Automated Publishing</p>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav">
+    <button
+      *ngFor="let item of navItems"
+      type="button"
+      class="sidebar__nav-item"
+      [class.sidebar__nav-item--active]="item.id === activeView"
+      (click)="onSelect(item.id)"
+    >
+      <mat-icon>{{ item.icon }}</mat-icon>
+      <span>{{ item.label }}</span>
+    </button>
+  </nav>
+
+  <div class="sidebar__footer">
+    <div class="sidebar__projects">
+      <p>Active Projects</p>
+      <strong>12</strong>
+    </div>
+  </div>
+</aside>
+
+

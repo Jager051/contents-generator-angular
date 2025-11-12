@@ -1,0 +1,67 @@
+<section class="view">
+  <header class="view__header">
+    <div>
+      <h2>Content Calendar</h2>
+      <p>Manage your scheduled posts.</p>
+    </div>
+    <button type="button" class="btn btn-gradient">
+      <mat-icon>event</mat-icon>
+      Schedule New Post
+    </button>
+  </header>
+
+  <div class="calendar-layout">
+    <div class="card calendar-grid">
+      <header class="calendar-grid__header">
+        <h3>November 2025</h3>
+        <div class="calendar-grid__controls">
+          <button type="button" class="btn btn-outline btn-sm">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button type="button" class="btn btn-outline btn-sm">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </header>
+
+      <div class="calendar-grid__weekdays">
+        <span *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']">
+          {{ day }}
+        </span>
+      </div>
+
+      <div class="calendar-grid__days">
+        <div
+          *ngFor="let day of calendarDays"
+          class="calendar-day"
+          [class.calendar-day--muted]="!day.isCurrentMonth"
+          [class.calendar-day--today]="day.isToday"
+          [class.calendar-day--has-post]="day.hasPost"
+        >
+          {{ day.label }}
+          <span *ngIf="day.hasPost" class="calendar-day__dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card calendar-sidebar">
+      <h3>Upcoming Posts</h3>
+      <div class="calendar-sidebar__list">
+        <article *ngFor="let post of scheduledPosts" class="calendar-sidebar__item">
+          <div class="calendar-sidebar__item-header">
+            <div class="calendar-sidebar__icon">
+              <mat-icon>smart_display</mat-icon>
+            </div>
+            <span>{{ post.title }}</span>
+          </div>
+          <div class="calendar-sidebar__meta">
+            <span>{{ post.date }} · {{ post.time }}</span>
+            <span class="badge badge-outline">{{ post.platform }}</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+

@@ -1,0 +1,38 @@
+.quick-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.quick-actions__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 18px;
+}
+
+.quick-actions__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  mat-icon {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .quick-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .quick-actions__button,
+  .quick-actions__icon {
+    width: 100%;
+  }
+}
+
+
