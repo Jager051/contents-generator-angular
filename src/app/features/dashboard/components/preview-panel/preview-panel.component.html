@@ -1,82 +1,83 @@
 <div class="preview-panel">
-  <section class="card">
-    <header class="card__header">
-      <h3>AI Generated Script</h3>
-      <span class="badge badge-outline badge-blue">Active</span>
-    </header>
+  <ng-container *ngIf="assetsToRender.length; else noAsset">
+    <section class="card" *ngFor="let asset of assetsToRender; trackBy: trackByAsset">
+      <header class="card__header">
+        <h3>{{ asset.title }}</h3>
+        <span class="badge badge-outline" [ngClass]="asset.statusColor">{{ asset.statusLabel }}</span>
+      </header>
 
-    <div class="script-preview">
-      <p>
-        "Discover the future of automation. Imagine a world where your content creates itself,
-        schedules itself, and publishes itself — all while you focus on what matters most..."
-      </p>
-    </div>
+      <div [ngSwitch]="asset.assetType">
+        <div *ngSwitchCase="'script'" class="script-preview">
+          <p>{{ asset.summary }}</p>
+        </div>
 
-    <div class="actions-grid">
-      <button type="button" class="btn btn-outline">
-        <mat-icon>thumb_up</mat-icon>
-        Approve
+        <div *ngSwitchCase="'music'">
+          <div class="music-preview">
+            <button type="button" class="btn btn-gradient btn-circle">
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+          </div>
+          <div class="info-row">
+            <mat-icon>volume_up</mat-icon>
+            <span>{{ asset.summary || 'Hazır parça' }}</span>
+            <span *ngIf="asset.durationSeconds">• {{ asset.durationSeconds }} sn</span>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'video'">
+          <div class="video-preview">
+            <button type="button" class="btn btn-translucent btn-circle">
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+          </div>
+          <p class="preview-hint">
+            Nihai videoyu gözden geçirmek için önizleme bağlantısını kullanabilirsiniz.
+          </p>
+        </div>
+
+        <p *ngSwitchDefault class="script-preview">
+          {{ asset.summary || 'Hazırlanıyor...' }}
+        </p>
+      </div>
+
+      <button
+        *ngIf="asset.previewUrl"
+        type="button"
+        class="btn btn-gradient w-100"
+        (click)="openPreview(asset)"
+      >
+        <mat-icon>open_in_new</mat-icon>
+        Önizlemeyi Aç
       </button>
-      <button type="button" class="btn btn-outline">
-        <mat-icon>thumb_down</mat-icon>
-        Regenerate
-      </button>
-    </div>
-  </section>
+    </section>
+  </ng-container>
 
-  <section class="card">
-    <header class="card__header">
-      <h3>Background Music</h3>
-      <span class="badge badge-outline badge-purple">Ready</span>
-    </header>
+  <ng-template #noAsset>
+    <section class="card empty-assets">
+      <h3>Önizleme bulunamadı</h3>
+      <p>Yeni bir iş akışı oluşturduğunuzda üretim kartlarını burada göreceksiniz.</p>
+    </section>
+  </ng-template>
 
-    <div class="music-preview">
-      <button type="button" class="btn btn-gradient btn-circle">
-        <mat-icon>play_arrow</mat-icon>
-      </button>
-    </div>
-
-    <div class="info-row">
-      <mat-icon>volume_up</mat-icon>
-      <span>Uplifting Electronic · 30s</span>
-    </div>
-  </section>
-
-  <section class="card">
-    <header class="card__header">
-      <h3>Video Preview</h3>
-      <span class="badge badge-outline badge-green">Generated</span>
-    </header>
-
-    <div class="video-preview">
-      <button type="button" class="btn btn-translucent btn-circle">
-        <mat-icon>play_arrow</mat-icon>
-      </button>
-    </div>
-
-    <button type="button" class="btn btn-gradient w-100">
-      <mat-icon>open_in_new</mat-icon>
-      Open Preview Link
-    </button>
-  </section>
-
-  <section class="card gradient-card">
+  <section class="card gradient-card" *ngIf="productionSnapshot as snapshot">
     <h3>Today's Progress</h3>
     <div class="progress-list">
       <div>
         <span>Videos Created</span>
-        <strong>5</strong>
+        <strong>{{ snapshot.videosCreated }}</strong>
       </div>
       <div>
         <span>Published</span>
-        <strong>3</strong>
+        <strong>{{ snapshot.published }}</strong>
       </div>
       <div>
         <span>Pending Approval</span>
-        <strong>2</strong>
+        <strong>{{ snapshot.pendingApproval }}</strong>
+      </div>
+      <div>
+        <span>Drafts</span>
+        <strong>{{ snapshot.drafts }}</strong>
       </div>
     </div>
   </section>
 </div>
-
-

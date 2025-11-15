@@ -1,22 +1,22 @@
 <div class="card stepper">
   <div class="stepper__header">
     <div>
-      <h3>Video Creation Workflow</h3>
-      <p>Step {{ activeStep }} of {{ steps.length }}</p>
+      <h3>{{ workflowName }}</h3>
+      <p>Step {{ activeStepLabel }} of {{ totalSteps }}</p>
     </div>
-    <span class="badge badge-gradient">In Progress</span>
+    <span class="badge badge-gradient">{{ statusLabel() }}</span>
   </div>
 
   <div class="stepper__list">
     <div
-      *ngFor="let step of steps; index as index"
+      *ngFor="let step of stepsToRender; index as index"
       class="stepper__item"
       [class.stepper__item--active]="statusOf(step) === 'active'"
       [class.stepper__item--completed]="statusOf(step) === 'completed'"
-      (click)="setActive(step.id)"
+      (click)="setActive(step.sequence || step.id)"
     >
       <div
-        *ngIf="index < steps.length - 1"
+        *ngIf="index < stepsToRender.length - 1"
         class="stepper__connector"
         [class.stepper__connector--completed]="statusOf(step) === 'completed'"
       ></div>

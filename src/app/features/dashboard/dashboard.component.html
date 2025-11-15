@@ -14,7 +14,14 @@
     </header>
 
     <section class="dashboard-shell__view" [ngSwitch]="activeView">
-      <app-dashboard-home *ngSwitchCase="'dashboard'" (newProject)="openNewProjectModal()"></app-dashboard-home>
+      <app-dashboard-home
+        *ngSwitchCase="'dashboard'"
+        (newProject)="openNewProjectModal()"
+        [overview]="overview$ | async"
+        [loading]="isOverviewLoading"
+        [errorMessage]="errorMessage"
+        (retry)="reloadOverview()"
+      ></app-dashboard-home>
       <app-workflow-list *ngSwitchCase="'workflows'" (newWorkflow)="handleNewWorkflow()"></app-workflow-list>
       <app-calendar-view *ngSwitchCase="'calendar'"></app-calendar-view>
       <app-history-view *ngSwitchCase="'history'"></app-history-view>

@@ -1,16 +1,70 @@
 <section class="dashboard-home">
-  <header class="dashboard-home__header">
-    <div>
-      <h2>Welcome back!</h2>
-      <p>Let's create amazing content today.</p>
+  <ng-container *ngIf="!loading && !errorMessage; else dashboardState">
+    <div class="dashboard-home__grid" *ngIf="overview; else emptyState">
+      <app-workflow-stepper
+        class="dashboard-home__workflow"
+        [steps]="overview.workflow.steps"
+        [activeStep]="overview.workflow.activeStepSequence"
+        [workflowName]="overview.workflow.name"
+        [workflowStatus]="overview.workflow.status"
+      ></app-workflow-stepper>
+      <app-preview-panel
+        class="dashboard-home__preview"
+        [assets]="overview.previewAssets"
+        [productionSnapshot]="overview.productionSnapshot"
+      ></app-preview-panel>
     </div>
-    <app-dashboard-quick-actions (newProject)="handleNewProject()"></app-dashboard-quick-actions>
-  </header>
-
-  <div class="dashboard-home__grid">
-    <app-workflow-stepper class="dashboard-home__workflow"></app-workflow-stepper>
-    <app-preview-panel class="dashboard-home__preview"></app-preview-panel>
-  </div>
+  </ng-container>
 </section>
 
+<ng-template #dashboardState>
+  <div class="dashboard-home__state">
+    <div *ngIf="loading" class="dashboard-home__loading">
+      <div class="dashboard-home__spinner"></div>
+      <p>Dashboard verileri yükleniyor...</p>
+    </div>
+    <div *ngIf="!loading && errorMessage" class="dashboard-home__state-card dashboard-home__state-card--tall">
+      <div class="dashboard-home__state-illustration">
+        <div class="dashboard-home__sparkles">
+          <span></span><span></span><span></span>
+        </div>
+        <mat-icon>movie_creation</mat-icon>
+      </div>
+      <h3>We couldn’t load your workflows</h3>
+      <p>But you can start fresh and design your first automated video journey right now.</p>
+      <ul class="dashboard-home__state-benefits">
+        <li>Spin up AI scripts, music and previews in minutes</li>
+        <li>Trigger publishing from schedules or Telegram</li>
+        <li>Share previews instantly with your team</li>
+      </ul>
+      <button type="button" class="btn btn-gradient btn-large" (click)="handleNewProject()">
+        <mat-icon>add</mat-icon>
+        Start Creating Videos
+      </button>
+    </div>
+  </div>
+</ng-template>
 
+<ng-template #emptyState>
+  <div class="dashboard-home__state">
+    <div class="dashboard-home__state-card dashboard-home__state-card--tall">
+      <div class="dashboard-home__state-illustration">
+        <div class="dashboard-home__sparkles">
+          <span></span><span></span><span></span>
+        </div>
+        <mat-icon>auto_awesome</mat-icon>
+      </div>
+      <h3>Your automation studio awaits</h3>
+      <p>Set up your first workflow to let AI craft videos, send previews and publish for you.</p>
+      <ul class="dashboard-home__state-benefits">
+        <li>Define your content schedule once</li>
+        <li>Connect Telegram for instant approvals</li>
+        <li>Deliver branded videos automatically</li>
+      </ul>
+      <button type="button" class="btn btn-gradient btn-large" (click)="handleNewProject()">
+        <mat-icon>play_arrow</mat-icon>
+        Start Creating Videos
+      </button>
+    </div>
+  </div>
+</ng-template>

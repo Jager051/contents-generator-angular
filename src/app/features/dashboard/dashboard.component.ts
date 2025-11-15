@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DashboardView } from './dashboard.model';
+import { DashboardOverview, DashboardView } from './dashboard.model';
+import { MatIconModule } from '@angular/material/icon';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DashboardHomeComponent } from './components/home/dashboard-home.component';
 import { WorkflowListComponent } from './components/workflow-list/workflow-list.component';
@@ -11,6 +12,8 @@ import { SettingsViewComponent } from './components/settings-view/settings-view.
 import { TelegramConnectComponent } from './components/telegram-connect/telegram-connect.component';
 import { NewProjectComponent } from './components/new-project/new-project.component';
 import { AuthService } from '../auth/services/auth.service';
+import { DashboardService } from './services/dashboard.service';
+import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,6 +22,7 @@ import { AuthService } from '../auth/services/auth.service';
     CommonModule,
     RouterModule,
     SidebarComponent,
+    MatIconModule,
     DashboardHomeComponent,
     WorkflowListComponent,
     CalendarViewComponent,
@@ -30,13 +34,20 @@ import { AuthService } from '../auth/services/auth.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   currentUser$;
   activeView: DashboardView = 'dashboard';
   isNewProjectOpen = false;
+  overview$!: Observable<DashboardOverview | null>;
+  isOverviewLoading = true;
+  errorMessage = '';
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private dashboardService: DashboardService) {
     this.currentUser$ = this.authService.currentUser$;
+  }
+
+  ngOnInit(): void {
+    this.loadOverview();
   }
 
   logout() {
@@ -65,5 +76,25 @@ export class DashboardComponent {
   handleProjectSave(project: unknown) {
     // Placeholder for integration with backend.
     console.info('New project created:', project);
+  }
+
+  reloadOverview() {
+    this.loadOverview();
+  }
+
+  private loadOverview() {
+    this.isOverviewLoading = true;
+    this.overview$ = this.dashboardService.getOverview().pipe(
+      tap(() => {
+        this.isOverviewLoading = false;
+        this.errorMessage = '';
+      }),
+      catchError((error) => {
+        this.isOverviewLoading = false;
+        this.errorMessage = error?.message || 'Dashboard verileri alınamadı';
+        return of(null);
+      }),
+      shareReplay(1)
+    );
   }
 }
