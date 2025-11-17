@@ -122,9 +122,20 @@
 
       <div class="modal__actions">
         <button type="button" class="btn btn-outline" (click)="handleClose()">Save as Draft</button>
-        <button type="button" class="btn btn-gradient" (click)="isLastStep ? submit() : nextStep()">
-          {{ isLastStep ? 'Create Project' : 'Next' }}
-          <mat-icon *ngIf="!isLastStep">chevron_right</mat-icon>
+        <button
+          type="button"
+          class="btn btn-gradient"
+          [disabled]="saving"
+          (click)="isLastStep ? submit() : nextStep()"
+        >
+          <ng-container *ngIf="isLastStep; else nextLabel">
+            <div class="btn-spinner" *ngIf="saving"></div>
+            {{ saving ? 'Creating...' : 'Create Project' }}
+          </ng-container>
+          <ng-template #nextLabel>
+            Next
+            <mat-icon>chevron_right</mat-icon>
+          </ng-template>
         </button>
       </div>
     </footer>

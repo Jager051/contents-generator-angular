@@ -53,3 +53,25 @@ export interface ProductionSnapshot {
   pendingApproval: number;
   drafts: number;
 }
+
+export interface NewWorkflowDraft {
+  name: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  description: string;
+  triggerType: 'schedule' | 'telegram' | 'custom';
+  triggerTime: string;
+  language: string;
+  autoPublish: boolean;
+}
+
+export type CreateWorkflowRequest = NewWorkflowDraft;
+
+export interface WorkflowSummary {
+  id: number;
+  name: string;
+  status: string;
+  frequency: string;
+  triggerDescription: string;
+  notes?: string | null;
+  createdAt: string;
+}

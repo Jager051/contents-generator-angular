@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DashboardOverview, DashboardView } from './dashboard.model';
+import { DashboardOverview, DashboardView, NewWorkflowDraft } from './dashboard.model';
 import { MatIconModule } from '@angular/material/icon';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DashboardHomeComponent } from './components/home/dashboard-home.component';
@@ -13,7 +13,7 @@ import { TelegramConnectComponent } from './components/telegram-connect/telegram
 import { NewProjectComponent } from './components/new-project/new-project.component';
 import { AuthService } from '../auth/services/auth.service';
 import { DashboardService } from './services/dashboard.service';
-import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
+import { Observable, catchError, finalize, of, shareReplay, tap } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,6 +41,7 @@ export class DashboardComponent implements OnInit {
   overview$!: Observable<DashboardOverview | null>;
   isOverviewLoading = true;
   errorMessage = '';
+  isCreatingWorkflow = false;
 
   constructor(private authService: AuthService, private dashboardService: DashboardService) {
     this.currentUser$ = this.authService.currentUser$;
@@ -73,9 +74,26 @@ export class DashboardComponent implements OnInit {
     }, 120);
   }
 
-  handleProjectSave(project: unknown) {
-    // Placeholder for integration with backend.
-    console.info('New project created:', project);
+  handleProjectSave(project: NewWorkflowDraft) {
+    this.isCreatingWorkflow = true;
+
+    this.dashboardService
+      .createWorkflow(project)
+      .pipe(
+        finalize(() => {
+          this.isCreatingWorkflow = false;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.closeNewProject();
+          this.loadOverview();
+        },
+        error: (error) => {
+          console.error('Workflow creation failed', error);
+          this.errorMessage = error?.message || 'Workflow could not be created';
+        }
+      });
   }
 
   reloadOverview() {

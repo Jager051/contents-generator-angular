@@ -1,22 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { NewWorkflowDraft } from '../../dashboard.model';
 
 interface Step {
   title: string;
   description: string;
-}
-
-interface ProjectDraft {
-  name: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
-  description: string;
-  triggerType: 'schedule' | 'telegram' | 'custom';
-  triggerTime: string;
-  language: string;
-  autoPublish: boolean;
 }
 
 @Component({
@@ -27,12 +18,13 @@ interface ProjectDraft {
   styleUrl: './new-project.component.scss'
 })
 export class NewProjectComponent {
+  @Input() saving = false;
   @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<ProjectDraft>();
+  @Output() save = new EventEmitter<NewWorkflowDraft>();
 
   currentStep = 0;
-  readonly frequencyOptions: ProjectDraft['frequency'][] = ['daily', 'weekly', 'monthly'];
-  readonly triggerOptions: ProjectDraft['triggerType'][] = ['schedule', 'telegram', 'custom'];
+  readonly frequencyOptions: NewWorkflowDraft['frequency'][] = ['daily', 'weekly', 'monthly'];
+  readonly triggerOptions: NewWorkflowDraft['triggerType'][] = ['schedule', 'telegram', 'custom'];
 
   readonly steps: Step[] = [
     { title: 'Project Details', description: 'Name and describe your automation project.' },
@@ -40,7 +32,7 @@ export class NewProjectComponent {
     { title: 'Review & Create', description: 'Confirm the details before creating your project.' }
   ];
 
-  draft: ProjectDraft = {
+  draft: NewWorkflowDraft = {
     name: '',
     frequency: 'daily',
     description: '',
@@ -72,14 +64,13 @@ export class NewProjectComponent {
 
   submit() {
     this.save.emit(this.draft);
-    this.handleClose();
   }
 
-  setFrequency(option: ProjectDraft['frequency']) {
+  setFrequency(option: NewWorkflowDraft['frequency']) {
     this.draft.frequency = option;
   }
 
-  setTriggerType(option: ProjectDraft['triggerType']) {
+  setTriggerType(option: NewWorkflowDraft['triggerType']) {
     this.draft.triggerType = option;
   }
 }
