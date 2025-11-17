@@ -76,10 +76,42 @@ export class AuthService {
     );
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/auth/login']);
+  logout(): Observable<GenericResponse<boolean>> {
+    const token = this.getToken();
+    
+    // If no token, just clear local state
+    if (!token) {
+      localStorage.removeItem('token');
+      this.currentUserSubject.next(null);
+      this.router.navigate(['/auth/login']);
+      return new Observable(observer => {
+        observer.next({
+          isSuccess: true,
+          message: 'Logout successful',
+          value: true,
+          timestamp: new Date().toISOString()
+        } as GenericResponse<boolean>);
+        observer.complete();
+      });
+    }
+
+    // Call logout API to invalidate token on server
+    return this.http.post<GenericResponse<boolean>>(`${this.API_URL}/auth/logout`, {}).pipe(
+      tap(() => {
+        // Clear local storage and state regardless of API response
+        localStorage.removeItem('token');
+        this.currentUserSubject.next(null);
+        this.router.navigate(['/auth/login']);
+      }),
+      catchError(error => {
+        // Even if API call fails, clear local state
+        console.error('Logout API error:', error);
+        localStorage.removeItem('token');
+        this.currentUserSubject.next(null);
+        this.router.navigate(['/auth/login']);
+        return throwError(() => error);
+      })
+    );
   }
 
   getCurrentUser(): Observable<UserResponse> {

@@ -59,7 +59,8 @@ export interface NewWorkflowDraft {
   frequency: 'daily' | 'weekly' | 'monthly';
   description: string;
   triggerType: 'schedule' | 'telegram' | 'custom';
-  triggerTime: string;
+  triggerTime: string; // Backend compatibility için korunuyor
+  triggerDateTime?: string; // Yeni: datetime-local format için
   language: string;
   autoPublish: boolean;
 }
@@ -74,4 +75,78 @@ export interface WorkflowSummary {
   triggerDescription: string;
   notes?: string | null;
   createdAt: string;
+}
+
+export interface WorkflowDetail {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  frequency: string;
+  triggerType: string;
+  triggerTime: string;
+  triggerDescription: string;
+  language: string;
+  autoPublish: boolean;
+  createdAt: string;
+  updatedAt?: string | null;
+}
+
+export interface UpdateWorkflowRequest {
+  workflowId: number;
+  name: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  description: string;
+  triggerType: 'schedule' | 'telegram' | 'custom';
+  triggerTime: string;
+  language: string;
+  autoPublish: boolean;
+}
+
+export interface WorkflowListItem {
+  id: number;
+  name: string;
+  status: string; // 'active' | 'paused' | 'error'
+  frequency: string; // 'daily' | 'weekly' | 'monthly'
+  trigger: string;
+  videosCreated: number;
+  lastRun: string;
+  nextRun: string;
+}
+
+export interface WorkflowListStats {
+  total: number;
+  active: number;
+  paused: number;
+  error: number;
+}
+
+export interface WorkflowList {
+  workflows: WorkflowListItem[];
+  stats: WorkflowListStats;
+}
+
+export interface CalendarWorkflowItem {
+  id: number;
+  name: string;
+  status: string;
+  frequency: string;
+  nextRunAt: string; // ISO date string
+  time: string; // "HH:mm" format
+}
+
+export interface CalendarDay {
+  day: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  hasWorkflow: boolean;
+  workflows: CalendarWorkflowItem[];
+}
+
+export interface Calendar {
+  year: number;
+  month: number;
+  monthName: string;
+  days: CalendarDay[];
+  upcomingWorkflows: CalendarWorkflowItem[];
 }

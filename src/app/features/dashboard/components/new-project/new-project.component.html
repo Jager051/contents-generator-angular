@@ -2,7 +2,7 @@
   <div class="modal card">
     <header class="modal__header">
       <div>
-        <h2>Create New Project</h2>
+        <h2>{{ modalTitle }}</h2>
         <p>Step {{ currentStep + 1 }} of {{ steps.length }} · {{ steps[currentStep].title }}</p>
       </div>
       <button type="button" class="btn btn-ghost" (click)="handleClose()">
@@ -72,8 +72,8 @@
           </div>
 
           <label class="field">
-            <span>Trigger Time</span>
-            <input [(ngModel)]="draft.triggerTime" name="trigger-time" type="time" />
+            <span>Trigger Date & Time</span>
+            <input [(ngModel)]="draft.triggerDateTime" name="trigger-datetime" type="datetime-local" />
           </label>
 
           <label class="field">
@@ -102,7 +102,7 @@
             <div>
               <h4>Triggers</h4>
               <p><strong>Type:</strong> {{ draft.triggerType | titlecase }}</p>
-              <p><strong>Time:</strong> {{ draft.triggerTime }}</p>
+              <p><strong>Date & Time:</strong> {{ formatDateTimeForDisplay(draft.triggerDateTime) }}</p>
               <p><strong>Auto Publish:</strong> {{ draft.autoPublish ? 'Enabled' : 'Disabled' }}</p>
             </div>
             <div class="span-2">
@@ -130,7 +130,7 @@
         >
           <ng-container *ngIf="isLastStep; else nextLabel">
             <div class="btn-spinner" *ngIf="saving"></div>
-            {{ saving ? 'Creating...' : 'Create Project' }}
+            {{ saving ? (isEditMode ? 'Updating...' : 'Creating...') : submitButtonText }}
           </ng-container>
           <ng-template #nextLabel>
             Next

@@ -89,9 +89,9 @@
   background: rgba(248, 250, 252, 0.75);
   border: 1px solid rgba(148, 163, 184, 0.15);
   transition: all 0.25s ease;
-  cursor: pointer;
+  cursor: default;
 
-  &:hover {
+  &:hover:not(.calendar-day--muted):not(.calendar-day--selected) {
     transform: translateY(-2px);
     box-shadow: 0 18px 30px rgba(148, 163, 184, 0.16);
   }
@@ -103,8 +103,26 @@
   border-color: transparent;
   cursor: default;
   box-shadow: none;
+  
   &:hover {
     transform: none;
+    box-shadow: none;
+  }
+}
+
+.calendar-day--has-post {
+  border-color: rgba(59, 130, 246, 0.45);
+  background: rgba(221, 241, 255, 0.7);
+  color: #1d4ed8;
+}
+
+.calendar-day--clickable {
+  cursor: pointer;
+
+  &:hover:not(.calendar-day--selected) {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 30px rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.6);
   }
 }
 
@@ -113,12 +131,37 @@
   border-color: transparent;
   color: white;
   box-shadow: 0 24px 42px rgba(91, 33, 182, 0.32);
+  
+  // If today is also selected, selected style takes priority
+  &.calendar-day--selected {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.5);
+  }
 }
 
-.calendar-day--has-post {
-  border-color: rgba(59, 130, 246, 0.45);
-  background: rgba(221, 241, 255, 0.7);
-  color: #1d4ed8;
+.calendar-day--selected {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  border-color: #1d4ed8 !important;
+  color: white !important;
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4) !important;
+  transform: translateY(-2px);
+  z-index: 1;
+
+  .calendar-day__dot {
+    background: white !important;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.5) !important;
+  }
+  
+  // Override has-post styles when selected
+  &.calendar-day--has-post {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    border-color: #1d4ed8 !important;
+    color: white !important;
+  }
 }
 
 .calendar-day__dot {
@@ -182,6 +225,34 @@
   justify-content: space-between;
   font-size: 12px;
   color: #64748b;
+}
+
+.loading-state,
+.error-state {
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+
+  p {
+    margin: 0 0 12px;
+  }
+
+  .btn {
+    margin-top: 8px;
+  }
+}
+
+.error-state {
+  color: #ef4444;
+}
+
+.empty-state {
+  text-align: center;
+  font-size: 14px;
+  color: #94a3b8;
+  padding: 20px;
+  margin: 0;
 }
 
 @media (max-width: 1024px) {

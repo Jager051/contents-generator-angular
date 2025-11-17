@@ -14,7 +14,7 @@
     <div class="card stats-card">
       <div class="stats-card__content">
         <p>Total Workflows</p>
-        <span>{{ workflows.length }}</span>
+        <span>{{ stats.total }}</span>
       </div>
       <div class="stats-card__icon stats-card__icon--blue">
         <mat-icon>play_circle</mat-icon>
@@ -58,10 +58,28 @@
       type="search"
       placeholder="Search workflows..."
       [(ngModel)]="searchQuery"
+      (ngModelChange)="onSearchChange()"
+      [disabled]="isLoading"
     />
   </div>
 
-  <div class="card table-card">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-icon class="spinner">refresh</mat-icon>
+    <p>Loading workflows...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button type="button" class="btn btn-gradient" (click)="loadWorkflows()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+
+  <div class="card table-card" *ngIf="!isLoading && !error">
     <div class="table-wrapper">
       <table>
         <thead>
@@ -111,20 +129,28 @@
             </td>
             <td>
               <div class="actions">
-                <button type="button" class="btn btn-ghost">
-                  <mat-icon>{{ workflow.status === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
+                <button 
+                  type="button" 
+                  class="btn btn-ghost"
+                  (click)="toggleWorkflowStatus(workflow)"
+                  [disabled]="isLoading"
+                  [title]="workflow.status.toLowerCase() === 'active' ? 'Pause workflow' : 'Resume workflow'"
+                >
+                  <mat-icon>{{ workflow.status.toLowerCase() === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
                 </button>
                 <button type="button" class="btn btn-ghost">
                   <mat-icon>visibility</mat-icon>
                 </button>
-                <button type="button" class="btn btn-ghost">
+                <button 
+                  type="button" 
+                  class="btn btn-ghost"
+                  (click)="editWorkflowHandler(workflow.id)"
+                  [title]="'Edit workflow'"
+                >
                   <mat-icon>edit</mat-icon>
                 </button>
                 <button type="button" class="btn btn-ghost danger">
                   <mat-icon>delete</mat-icon>
-                </button>
-                <button type="button" class="btn btn-ghost">
-                  <mat-icon>more_vert</mat-icon>
                 </button>
               </div>
             </td>
@@ -134,8 +160,13 @@
     </div>
   </div>
 
-  <p *ngIf="filteredWorkflows.length === 0" class="empty-state">
-    No workflows found matching “{{ searchQuery }}”.
+  <p *ngIf="!isLoading && !error && filteredWorkflows.length === 0" class="empty-state">
+    <ng-container *ngIf="searchQuery; else noWorkflows">
+      No workflows found matching "{{ searchQuery }}".
+    </ng-container>
+    <ng-template #noWorkflows>
+      No workflows found. Create your first workflow to get started.
+    </ng-template>
   </p>
 </section>
 

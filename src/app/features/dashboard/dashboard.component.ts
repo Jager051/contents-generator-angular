@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DashboardOverview, DashboardView, NewWorkflowDraft } from './dashboard.model';
+import { DashboardOverview, DashboardView, NewWorkflowDraft, WorkflowDetail, UpdateWorkflowRequest } from './dashboard.model';
 import { MatIconModule } from '@angular/material/icon';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DashboardHomeComponent } from './components/home/dashboard-home.component';
@@ -38,10 +38,14 @@ export class DashboardComponent implements OnInit {
   currentUser$;
   activeView: DashboardView = 'dashboard';
   isNewProjectOpen = false;
+  editingWorkflow: WorkflowDetail | null = null;
   overview$!: Observable<DashboardOverview | null>;
   isOverviewLoading = true;
   errorMessage = '';
   isCreatingWorkflow = false;
+  isUpdatingWorkflow = false;
+  
+  @ViewChild(WorkflowListComponent) workflowListComponent?: WorkflowListComponent;
 
   constructor(private authService: AuthService, private dashboardService: DashboardService) {
     this.currentUser$ = this.authService.currentUser$;
@@ -52,7 +56,15 @@ export class DashboardComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout();
+    this.authService.logout().subscribe({
+      next: () => {
+        // Logout successful - navigation is handled in AuthService
+      },
+      error: (err) => {
+        console.error('Logout error:', err);
+        // Even if API call fails, user is already logged out locally
+      }
+    });
   }
 
   setActiveView(view: DashboardView) {
@@ -60,11 +72,26 @@ export class DashboardComponent implements OnInit {
   }
 
   openNewProjectModal() {
+    this.editingWorkflow = null;
     this.isNewProjectOpen = true;
   }
 
   closeNewProject() {
     this.isNewProjectOpen = false;
+    this.editingWorkflow = null;
+  }
+
+  openEditWorkflowModal(workflowId: number) {
+    this.dashboardService.getWorkflowById(workflowId).subscribe({
+      next: (workflow) => {
+        this.editingWorkflow = workflow;
+        this.isNewProjectOpen = true;
+      },
+      error: (err) => {
+        console.error('Failed to load workflow:', err);
+        this.errorMessage = err.message || 'Workflow detayları yüklenemedi';
+      }
+    });
   }
 
   handleNewWorkflow() {
@@ -75,25 +102,57 @@ export class DashboardComponent implements OnInit {
   }
 
   handleProjectSave(project: NewWorkflowDraft) {
-    this.isCreatingWorkflow = true;
+    if (this.editingWorkflow) {
+      // Update existing workflow
+      this.isUpdatingWorkflow = true;
+      const updateRequest: UpdateWorkflowRequest = {
+        workflowId: this.editingWorkflow.id,
+        ...project
+      };
 
-    this.dashboardService
-      .createWorkflow(project)
-      .pipe(
-        finalize(() => {
-          this.isCreatingWorkflow = false;
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.closeNewProject();
-          this.loadOverview();
-        },
-        error: (error) => {
-          console.error('Workflow creation failed', error);
-          this.errorMessage = error?.message || 'Workflow could not be created';
-        }
-      });
+      this.dashboardService
+        .updateWorkflow(updateRequest)
+        .pipe(
+          finalize(() => {
+            this.isUpdatingWorkflow = false;
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.closeNewProject();
+            this.loadOverview();
+            // Reload workflow list if we're on workflows view
+            if (this.activeView === 'workflows' && this.workflowListComponent) {
+              this.workflowListComponent.reload();
+            }
+          },
+          error: (error) => {
+            console.error('Workflow update failed', error);
+            this.errorMessage = error?.message || 'Workflow güncellenemedi';
+          }
+        });
+    } else {
+      // Create new workflow
+      this.isCreatingWorkflow = true;
+
+      this.dashboardService
+        .createWorkflow(project)
+        .pipe(
+          finalize(() => {
+            this.isCreatingWorkflow = false;
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.closeNewProject();
+            this.loadOverview();
+          },
+          error: (error) => {
+            console.error('Workflow creation failed', error);
+            this.errorMessage = error?.message || 'Workflow could not be created';
+          }
+        });
+    }
   }
 
   reloadOverview() {

@@ -13,12 +13,15 @@
   <div class="calendar-layout">
     <div class="card calendar-grid">
       <header class="calendar-grid__header">
-        <h3>November 2025</h3>
+        <h3>{{ monthName }} {{ currentYear }}</h3>
         <div class="calendar-grid__controls">
-          <button type="button" class="btn btn-outline btn-sm">
+          <button type="button" class="btn btn-outline btn-sm" (click)="previousMonth()" [disabled]="isLoading">
             <mat-icon>chevron_left</mat-icon>
           </button>
-          <button type="button" class="btn btn-outline btn-sm">
+          <button type="button" class="btn btn-outline btn-sm" (click)="goToToday()" [disabled]="isLoading">
+            Today
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" (click)="nextMonth()" [disabled]="isLoading">
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
@@ -36,29 +39,57 @@
           class="calendar-day"
           [class.calendar-day--muted]="!day.isCurrentMonth"
           [class.calendar-day--today]="day.isToday"
-          [class.calendar-day--has-post]="day.hasPost"
+          [class.calendar-day--has-post]="day.hasWorkflow"
+          [class.calendar-day--selected]="isDaySelected(day)"
+          [class.calendar-day--clickable]="day.isCurrentMonth && day.hasWorkflow"
+          (click)="selectDay(day)"
         >
-          {{ day.label }}
-          <span *ngIf="day.hasPost" class="calendar-day__dot"></span>
+          {{ day.day || '' }}
+          <span *ngIf="day.hasWorkflow" class="calendar-day__dot"></span>
         </div>
       </div>
     </div>
 
     <div class="card calendar-sidebar">
-      <h3>Upcoming Posts</h3>
+      <h3>{{ sidebarTitle }}</h3>
       <div class="calendar-sidebar__list">
-        <article *ngFor="let post of scheduledPosts" class="calendar-sidebar__item">
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-state">
+          <p>Loading...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error && !isLoading" class="error-state">
+          <p>{{ error }}</p>
+          <button type="button" class="btn btn-gradient" (click)="loadCalendar()">
+            <mat-icon>refresh</mat-icon>
+            Retry
+          </button>
+        </div>
+
+        <!-- Workflows List -->
+        <article *ngFor="let workflow of upcomingWorkflows" class="calendar-sidebar__item">
           <div class="calendar-sidebar__item-header">
             <div class="calendar-sidebar__icon">
-              <mat-icon>smart_display</mat-icon>
+              <mat-icon>play_arrow</mat-icon>
             </div>
-            <span>{{ post.title }}</span>
+            <span>{{ workflow.name }}</span>
           </div>
           <div class="calendar-sidebar__meta">
-            <span>{{ post.date }} · {{ post.time }}</span>
-            <span class="badge badge-outline">{{ post.platform }}</span>
+            <span>{{ formatDate(workflow.nextRunAt) }} · {{ workflow.time }}</span>
+            <span class="badge badge-outline">{{ workflow.frequency }}</span>
           </div>
         </article>
+
+        <!-- Empty State -->
+        <p *ngIf="!isLoading && !error && upcomingWorkflows.length === 0" class="empty-state">
+          <ng-container *ngIf="selectedDay; else noWorkflows">
+            No workflows scheduled for this day.
+          </ng-container>
+          <ng-template #noWorkflows>
+            No upcoming workflows scheduled.
+          </ng-template>
+        </p>
       </div>
     </div>
   </div>

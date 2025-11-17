@@ -1,20 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-
-interface ScheduledPost {
-  date: string;
-  time: string;
-  title: string;
-  platform: string;
-}
-
-interface CalendarDay {
-  label: string;
-  isCurrentMonth: boolean;
-  hasPost: boolean;
-  isToday: boolean;
-}
+import { DashboardService } from '../../services/dashboard.service';
+import { Calendar, CalendarDay, CalendarWorkflowItem } from '../../dashboard.model';
 
 @Component({
   selector: 'app-calendar-view',
@@ -23,28 +11,114 @@ interface CalendarDay {
   templateUrl: './calendar-view.component.html',
   styleUrl: './calendar-view.component.scss'
 })
-export class CalendarViewComponent {
-  readonly scheduledPosts: ScheduledPost[] = [
-    { date: '2025-11-12', time: '08:00', title: 'Morning Motivation', platform: 'YouTube' },
-    { date: '2025-11-12', time: '14:00', title: 'Tech Tips', platform: 'TikTok' },
-    { date: '2025-11-13', time: '08:00', title: 'Daily Inspiration', platform: 'YouTube' },
-    { date: '2025-11-13', time: '20:00', title: 'Evening Wisdom', platform: 'TikTok' },
-    { date: '2025-11-14', time: '08:00', title: 'Success Stories', platform: 'YouTube' }
-  ];
+export class CalendarViewComponent implements OnInit {
+  calendar: Calendar | null = null;
+  currentYear: number;
+  currentMonth: number;
+  isLoading = false;
+  error: string | null = null;
+  selectedDay: CalendarDay | null = null;
 
-  readonly calendarDays: CalendarDay[] = Array.from({ length: 35 }, (_, index) => {
-    const dayNumber = index - 4;
-    const isCurrentMonth = dayNumber > 0 && dayNumber <= 30;
-    const hasPost = [12, 13, 14, 15, 16].includes(dayNumber);
-    const isToday = dayNumber === 11;
+  constructor(private dashboardService: DashboardService) {
+    const now = new Date();
+    this.currentYear = now.getFullYear();
+    this.currentMonth = now.getMonth() + 1; // JavaScript months are 0-indexed
+  }
 
-    return {
-      label: isCurrentMonth ? String(dayNumber) : '',
-      isCurrentMonth,
-      hasPost,
-      isToday
-    };
-  });
+  ngOnInit(): void {
+    this.loadCalendar();
+  }
+
+  loadCalendar(): void {
+    this.isLoading = true;
+    this.error = null;
+    this.selectedDay = null; // Reset selection when loading new month
+
+    this.dashboardService.getCalendar(this.currentYear, this.currentMonth).subscribe({
+      next: (data) => {
+        this.calendar = data;
+        this.isLoading = false;
+        this.error = null;
+      },
+      error: (err) => {
+        this.error = err.message || 'Takvim verileri yüklenirken bir hata oluştu';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  previousMonth(): void {
+    if (this.currentMonth === 1) {
+      this.currentMonth = 12;
+      this.currentYear--;
+    } else {
+      this.currentMonth--;
+    }
+    this.loadCalendar();
+  }
+
+  nextMonth(): void {
+    if (this.currentMonth === 12) {
+      this.currentMonth = 1;
+      this.currentYear++;
+    } else {
+      this.currentMonth++;
+    }
+    this.loadCalendar();
+  }
+
+  goToToday(): void {
+    const now = new Date();
+    this.currentYear = now.getFullYear();
+    this.currentMonth = now.getMonth() + 1;
+    this.loadCalendar();
+  }
+
+  get calendarDays(): CalendarDay[] {
+    return this.calendar?.days || [];
+  }
+
+  get upcomingWorkflows(): CalendarWorkflowItem[] {
+    // If a day is selected, show workflows for that day
+    if (this.selectedDay && this.selectedDay.hasWorkflow) {
+      return this.selectedDay.workflows;
+    }
+    // Otherwise show all upcoming workflows
+    return this.calendar?.upcomingWorkflows || [];
+  }
+
+  get sidebarTitle(): string {
+    if (this.selectedDay && this.selectedDay.isCurrentMonth) {
+      const date = new Date(this.currentYear, this.currentMonth - 1, this.selectedDay.day);
+      return `Workflows for ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    }
+    return 'Upcoming Workflows';
+  }
+
+  selectDay(day: CalendarDay): void {
+    // Only allow selecting days from current month that have workflows
+    if (day.isCurrentMonth && day.hasWorkflow) {
+      // Toggle selection - if clicking the same day, deselect it
+      if (this.selectedDay === day) {
+        this.selectedDay = null;
+      } else {
+        this.selectedDay = day;
+      }
+    }
+  }
+
+  isDaySelected(day: CalendarDay): boolean {
+    return this.selectedDay === day;
+  }
+
+  get monthName(): string {
+    return this.calendar?.monthName || '';
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
 }
 
 

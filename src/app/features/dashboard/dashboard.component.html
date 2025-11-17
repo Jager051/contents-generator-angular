@@ -7,8 +7,8 @@
         <h1>AI Video Operations</h1>
         <p>Orchestrate automated content workflows, approvals, and publishing.</p>
       </div>
-      <div class="dashboard-shell__user" *ngIf="currentUser$ | async as user">
-        <span>Hoş geldiniz, {{ user.firstName || user.username }}!</span>
+      <div class="dashboard-shell__user">
+        <span *ngIf="currentUser$ | async as user">Hoş geldiniz, {{ user.firstName || user.username }}!</span>
         <button type="button" class="btn btn-outline" (click)="logout()">Çıkış Yap</button>
       </div>
     </header>
@@ -22,7 +22,11 @@
         [errorMessage]="errorMessage"
         (retry)="reloadOverview()"
       ></app-dashboard-home>
-      <app-workflow-list *ngSwitchCase="'workflows'" (newWorkflow)="handleNewWorkflow()"></app-workflow-list>
+      <app-workflow-list 
+        *ngSwitchCase="'workflows'" 
+        (newWorkflow)="handleNewWorkflow()"
+        (editWorkflow)="openEditWorkflowModal($event)"
+      ></app-workflow-list>
       <app-calendar-view *ngSwitchCase="'calendar'"></app-calendar-view>
       <app-history-view *ngSwitchCase="'history'"></app-history-view>
       <app-settings-view *ngSwitchCase="'settings'"></app-settings-view>
@@ -32,7 +36,8 @@
 
   <app-new-project
     *ngIf="isNewProjectOpen"
-    [saving]="isCreatingWorkflow"
+    [saving]="isCreatingWorkflow || isUpdatingWorkflow"
+    [workflow]="editingWorkflow"
     (close)="closeNewProject()"
     (save)="handleProjectSave($event)"
   ></app-new-project>
