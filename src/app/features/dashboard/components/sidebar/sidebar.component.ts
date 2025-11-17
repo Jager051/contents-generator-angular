@@ -18,6 +18,7 @@ interface NavItem {
 })
 export class SidebarComponent {
   @Input({ required: true }) activeView!: DashboardView;
+  @Input() activeProjectsCount: number = 0;
   @Output() viewChange = new EventEmitter<DashboardView>();
 
   readonly navItems: NavItem[] = [

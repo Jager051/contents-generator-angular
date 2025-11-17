@@ -138,4 +138,25 @@ export class AuthService {
   getToken(): string | null {
     return localStorage.getItem('token');
   }
+
+  forgotPassword(email: string): Observable<GenericResponse<boolean>> {
+    return this.http.post<GenericResponse<boolean>>(`${this.API_URL}/auth/forgot-password`, { email }).pipe(
+      catchError(error => {
+        console.error('Forgot password error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<GenericResponse<boolean>> {
+    return this.http.post<GenericResponse<boolean>>(`${this.API_URL}/auth/reset-password`, {
+      token,
+      newPassword
+    }).pipe(
+      catchError(error => {
+        console.error('Reset password error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 }

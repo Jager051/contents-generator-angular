@@ -1,5 +1,9 @@
 <div class="dashboard-shell">
-  <app-dashboard-sidebar [activeView]="activeView" (viewChange)="setActiveView($event)"></app-dashboard-sidebar>
+  <app-dashboard-sidebar 
+    [activeView]="activeView" 
+    [activeProjectsCount]="(overview$ | async)?.activeProjectsCount || 0"
+    (viewChange)="setActiveView($event)"
+  ></app-dashboard-sidebar>
 
   <div class="dashboard-shell__content">
     <header class="dashboard-shell__header">

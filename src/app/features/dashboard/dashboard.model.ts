@@ -10,6 +10,7 @@ export interface DashboardOverview {
   workflow: WorkflowOverview;
   previewAssets: WorkflowAsset[];
   productionSnapshot: ProductionSnapshot;
+  activeProjectsCount: number;
 }
 
 export interface WorkflowOverview {
