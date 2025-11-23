@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PopupService } from '../../../../core/services/popup.service';
+import { GlassCardComponent } from '../../../../core/components/glass-card/glass-card.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, GlassCardComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -95,27 +96,27 @@ export class RegisterComponent {
   getErrorMessage(field: string): string {
     const control = this.registerForm.get(field);
     if (control?.hasError('required')) {
-      return `${this.getFieldName(field)} gereklidir`;
+      return `${this.getFieldName(field)} is required`;
     }
     if (control?.hasError('email')) {
-      return 'Geçerli bir e-posta adresi giriniz';
+      return 'Please enter a valid email address';
     }
     if (control?.hasError('minlength')) {
-      return `${this.getFieldName(field)} en az ${control.errors?.['minlength'].requiredLength} karakter olmalıdır`;
+      return `${this.getFieldName(field)} must be at least ${control.errors?.['minlength'].requiredLength} characters`;
     }
     if (control?.hasError('passwordMismatch')) {
-      return 'Şifreler eşleşmiyor';
+      return 'Passwords do not match';
     }
     return '';
   }
 
   private getFieldName(field: string): string {
     const fieldNames: { [key: string]: string } = {
-      'firstName': 'Ad',
-      'lastName': 'Soyad',
-      'email': 'E-posta',
-      'password': 'Şifre',
-      'confirmPassword': 'Şifre tekrarı'
+      'firstName': 'First name',
+      'lastName': 'Last name',
+      'email': 'Email',
+      'password': 'Password',
+      'confirmPassword': 'Confirm password'
     };
     return fieldNames[field] || field;
   }

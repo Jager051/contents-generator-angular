@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PopupService } from '../../../../core/services/popup.service';
+import { GlassCardComponent } from '../../../../core/components/glass-card/glass-card.component';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, GlassCardComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.scss'
 })
@@ -56,17 +57,17 @@ export class ForgotPasswordComponent {
   getErrorMessage(field: string): string {
     const control = this.forgotPasswordForm.get(field);
     if (control?.hasError('required')) {
-      return `${this.getFieldName(field)} gereklidir`;
+      return `${this.getFieldName(field)} is required`;
     }
     if (control?.hasError('email')) {
-      return 'Geçerli bir e-posta adresi giriniz';
+      return 'Please enter a valid email address';
     }
     return '';
   }
 
   private getFieldName(field: string): string {
     const fieldNames: { [key: string]: string } = {
-      'email': 'E-posta'
+      'email': 'Email'
     };
     return fieldNames[field] || field;
   }

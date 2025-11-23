@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PopupService } from '../../../../core/services/popup.service';
+import { GlassCardComponent } from '../../../../core/components/glass-card/glass-card.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, GlassCardComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -83,4 +84,3 @@ export class LoginComponent {
     return '';
   }
 }
-
