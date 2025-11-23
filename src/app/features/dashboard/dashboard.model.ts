@@ -17,7 +17,6 @@ export interface WorkflowOverview {
   id: number;
   name: string;
   status: string;
-  frequency: string;
   triggerDescription: string;
   nextRunNote?: string | null;
   lastRunAt?: string | null;
@@ -55,15 +54,26 @@ export interface ProductionSnapshot {
   drafts: number;
 }
 
+export interface SharingPlatform {
+  platform: 'instagram' | 'youtube' | 'tiktok' | 'facebook' | 'twitter' | 'linkedin';
+  enabled: boolean;
+  accountId?: string; // Connected account ID from settings
+  accountName?: string; // Account display name
+}
+
+export interface SharingSettings {
+  platforms: SharingPlatform[];
+  autoPublish?: boolean; // Override workflow-level autoPublish
+}
+
 export interface NewWorkflowDraft {
   name: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
   description: string;
-  triggerType: 'schedule' | 'telegram' | 'custom';
-  triggerTime: string; // Backend compatibility için korunuyor
-  triggerDateTime?: string; // Yeni: datetime-local format için
   language: string;
   autoPublish: boolean;
+  scenarios?: ScenarioForm[]; // Senaryolar
+  notificationSettings?: WorkflowNotificationSettings; // Bildirim ayarları
+  sharingSettings?: SharingSettings; // Paylaşım ayarları
 }
 
 export type CreateWorkflowRequest = NewWorkflowDraft;
@@ -72,7 +82,6 @@ export interface WorkflowSummary {
   id: number;
   name: string;
   status: string;
-  frequency: string;
   triggerDescription: string;
   notes?: string | null;
   createdAt: string;
@@ -83,9 +92,6 @@ export interface WorkflowDetail {
   name: string;
   description: string;
   status: string;
-  frequency: string;
-  triggerType: string;
-  triggerTime: string;
   triggerDescription: string;
   language: string;
   autoPublish: boolean;
@@ -96,10 +102,7 @@ export interface WorkflowDetail {
 export interface UpdateWorkflowRequest {
   workflowId: number;
   name: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
   description: string;
-  triggerType: 'schedule' | 'telegram' | 'custom';
-  triggerTime: string;
   language: string;
   autoPublish: boolean;
 }
@@ -108,7 +111,6 @@ export interface WorkflowListItem {
   id: number;
   name: string;
   status: string; // 'active' | 'paused' | 'error'
-  frequency: string; // 'daily' | 'weekly' | 'monthly'
   trigger: string;
   videosCreated: number;
   lastRun: string;
@@ -131,7 +133,6 @@ export interface CalendarWorkflowItem {
   id: number;
   name: string;
   status: string;
-  frequency: string;
   nextRunAt: string; // ISO date string
   time: string; // "HH:mm" format
 }
@@ -150,4 +151,49 @@ export interface Calendar {
   monthName: string;
   days: CalendarDay[];
   upcomingWorkflows: CalendarWorkflowItem[];
+}
+
+// Scenario Models
+export interface Scenario {
+  id?: number;
+  title: string;
+  description: string;
+  videoDateTime: string; // ISO date string (datetime-local format)
+  workflowId?: number;
+  hasAudio?: boolean;
+  videoType?: 'short' | 'reels' | 'normal' | 'story';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ScenarioForm {
+  title: string;
+  description: string;
+  videoDateTime: string; // datetime-local format: "YYYY-MM-DDTHH:mm"
+  hasAudio?: boolean;
+  videoType?: 'short' | 'reels' | 'normal' | 'story';
+  isManualDescription?: boolean; // true = user entered manually, false = AI generated
+}
+
+// Notification Models
+export interface NotificationSettings {
+  scenarioId: number;
+  scenarioTitle: string;
+  channels: NotificationChannel[];
+}
+
+export interface NotificationChannel {
+  type: 'email' | 'telegram' | 'webhook' | 'sms';
+  enabled: boolean;
+  value?: string; // Email address, Telegram chat ID, Webhook URL, Phone number
+}
+
+export interface WorkflowNotificationSettings {
+  scenarios: NotificationSettings[];
+  globalSettings?: {
+    emailEnabled: boolean;
+    telegramEnabled: boolean;
+    defaultEmail?: string;
+    defaultTelegramChatId?: string;
+  };
 }

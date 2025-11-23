@@ -86,7 +86,6 @@
           <tr>
             <th>Workflow Name</th>
             <th>Status</th>
-            <th>Frequency</th>
             <th>Trigger</th>
             <th>Videos Created</th>
             <th>Next Run</th>
@@ -109,13 +108,10 @@
             <td>
               <span class="badge badge-outline" [ngClass]="statusClass(workflow.status)">
                 <mat-icon>{{ statusIcon(workflow.status) }}</mat-icon>
-                <span class="capitalize">{{ workflow.status }}</span>
-              </span>
-            </td>
-            <td>
-              <span class="badge badge-outline capitalize">{{ workflow.frequency }}</span>
-            </td>
-            <td>
+              <span class="capitalize">{{ workflow.status }}</span>
+            </span>
+          </td>
+          <td>
               <div class="trigger-cell">
                 <mat-icon>schedule</mat-icon>
                 {{ workflow.trigger }}

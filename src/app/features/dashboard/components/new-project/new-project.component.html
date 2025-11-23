@@ -23,26 +23,12 @@
 
     <div class="modal__content">
       <ng-container [ngSwitch]="currentStep">
+        <!-- Step 1: Workflow Details -->
         <form *ngSwitchCase="0" class="form-grid">
           <label class="field span-2">
             <span>Project Name</span>
-            <input [(ngModel)]="draft.name" name="project-name" type="text" placeholder="Daily Motivation Videos" />
+            <input [(ngModel)]="draft.name" name="project-name" type="text" placeholder="Daily Motivation Videos" required />
           </label>
-
-          <div class="field span-2">
-            <span>Content Frequency</span>
-            <div class="pill-group">
-              <button
-                type="button"
-                *ngFor="let option of frequencyOptions"
-                class="pill"
-                [class.pill--selected]="draft.frequency === option"
-                (click)="setFrequency(option)"
-              >
-                {{ option | titlecase }}
-              </button>
-            </div>
-          </div>
 
           <label class="field span-2">
             <span>Topic or Theme Description</span>
@@ -51,64 +37,297 @@
               name="project-description"
               rows="4"
               placeholder="Describe what your videos will be about."
+              required
             ></textarea>
           </label>
         </form>
 
-        <form *ngSwitchCase="1" class="form-grid">
-          <div class="field span-2">
-            <span>Trigger Type</span>
-            <div class="pill-group">
-              <button
-                type="button"
-                *ngFor="let option of triggerOptions"
-                class="pill"
-                [class.pill--selected]="draft.triggerType === option"
-                (click)="setTriggerType(option)"
-              >
-                {{ option | titlecase }}
-              </button>
+        <!-- Step 2: Scenario Creation -->
+        <div *ngSwitchCase="1" class="scenario-creation">
+          <div class="scenario-form">
+            <h3>{{ isEditingScenario ? 'Edit Scenario' : 'Create New Scenario' }}</h3>
+            <form class="form-grid">
+              <label class="field span-2">
+                <span>Scenario Title</span>
+                <input
+                  [(ngModel)]="scenarioForm.title"
+                  name="scenario-title"
+                  type="text"
+                  placeholder="Morning Motivation Video"
+                  required
+                />
+              </label>
+
+              <div class="field span-2">
+                <div class="toggle-with-note">
+                  <div class="toggle-header">
+                    <div>
+                      <span class="field-label">Enter manually</span>
+                      <small *ngIf="!isManualDescriptionMode">Would you like to get scenario suggestions from AI?</small>
+                    </div>
+                    <mat-slide-toggle [(ngModel)]="isManualDescriptionMode" name="manual-description-mode"></mat-slide-toggle>
+                  </div>
+                  <label class="field" *ngIf="isManualDescriptionMode">
+                    <span>Scenario Description</span>
+                    <textarea
+                      [(ngModel)]="scenarioForm.description"
+                      name="scenario-description"
+                      rows="3"
+                      placeholder="Describe the scenario details and content..."
+                      [required]="isManualDescriptionMode"
+                    ></textarea>
+                  </label>
+                  <div *ngIf="!isManualDescriptionMode" class="ai-suggestion-note">
+                    <mat-icon>auto_awesome</mat-icon>
+                    <p>AI will generate scenario suggestions based on your workflow theme.</p>
+                  </div>
+                </div>
+              </div>
+
+              <label class="field span-2">
+                <span>Video Date & Time</span>
+                <input
+                  [(ngModel)]="scenarioForm.videoDateTime"
+                  name="video-datetime"
+                  type="datetime-local"
+                  required
+                />
+              </label>
+
+              <div class="field toggle span-2">
+                <div>
+                  <p>Do you want audio in the video?</p>
+                  <small>Enable audio narration for this video.</small>
+                </div>
+                <mat-slide-toggle [(ngModel)]="scenarioForm.hasAudio" name="has-audio"></mat-slide-toggle>
+              </div>
+
+              <div class="field span-2">
+                <span>What type of video should it be?</span>
+                <div class="pill-group">
+                  <button
+                    type="button"
+                    *ngFor="let option of videoTypeOptions"
+                    class="pill"
+                    [class.pill--selected]="scenarioForm.videoType === option"
+                    (click)="scenarioForm.videoType = option"
+                  >
+                    {{ option | titlecase }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="field span-2 scenario-form__actions">
+                <button
+                  *ngIf="isEditingScenario"
+                  type="button"
+                  class="btn btn-outline"
+                  (click)="cancelEdit()"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-gradient btn-add"
+                  (click)="addScenario()"
+                  [disabled]="!scenarioForm.title.trim() || (isManualDescriptionMode && !scenarioForm.description.trim())"
+                >
+                  <mat-icon>{{ isEditingScenario ? 'save' : 'add' }}</mat-icon>
+                  {{ isEditingScenario ? 'Update Scenario' : 'Add Scenario' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="scenario-list" *ngIf="draft.scenarios && draft.scenarios.length > 0">
+            <h3>Added Scenarios ({{ draft.scenarios.length }})</h3>
+            <div class="scenario-items">
+              <div *ngFor="let scenario of draft.scenarios; index as i" class="scenario-item" [class.scenario-item--editing]="editingScenarioIndex === i">
+                <div class="scenario-item__content">
+                  <div class="scenario-item__header">
+                    <h4>{{ scenario.title }}</h4>
+                    <div class="scenario-item__actions">
+                      <button
+                        type="button"
+                        class="btn-icon btn-icon--edit"
+                        (click)="editScenario(i)"
+                        [attr.aria-label]="'Edit scenario ' + scenario.title"
+                        title="Edit scenario"
+                      >
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-icon"
+                        (click)="removeScenario(i)"
+                        [attr.aria-label]="'Remove scenario ' + scenario.title"
+                        title="Remove scenario"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <p class="scenario-item__description" *ngIf="scenario.description">{{ scenario.description }}</p>
+                  <p class="scenario-item__description scenario-item__description--ai" *ngIf="!scenario.description">
+                    <mat-icon>auto_awesome</mat-icon>
+                    AI will generate description
+                  </p>
+                  <div class="scenario-item__meta">
+                    <div class="meta-item">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ formatDateTimeForDisplayShort(scenario.videoDateTime) }}</span>
+                    </div>
+                    <div class="meta-item">
+                      <mat-icon>{{ scenario.hasAudio ? 'volume_up' : 'volume_off' }}</mat-icon>
+                      <span>{{ scenario.hasAudio ? 'With Audio' : 'No Audio' }}</span>
+                    </div>
+                    <div class="meta-item">
+                      <mat-icon>videocam</mat-icon>
+                      <span>{{ (scenario.videoType || 'normal') | titlecase }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <label class="field">
-            <span>Trigger Date & Time</span>
-            <input [(ngModel)]="draft.triggerDateTime" name="trigger-datetime" type="datetime-local" />
-          </label>
-
-          <label class="field">
-            <span>Language</span>
-            <input [(ngModel)]="draft.language" name="language" type="text" />
-          </label>
-
-          <div class="field toggle span-2">
-            <div>
-              <p>Auto-Publish Videos</p>
-              <small>Send directly to connected platforms after approval.</small>
-            </div>
-            <mat-slide-toggle [(ngModel)]="draft.autoPublish" name="auto-publish"></mat-slide-toggle>
+          <div *ngIf="!draft.scenarios || draft.scenarios.length === 0" class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p>No scenarios added yet. Create your first scenario above.</p>
           </div>
-        </form>
+        </div>
 
-        <div *ngSwitchCase="2" class="review">
-          <h3>Review Summary</h3>
-          <div class="review__grid">
-            <div>
-              <h4>Project Basics</h4>
-              <p><strong>Name:</strong> {{ draft.name || 'Not set' }}</p>
-              <p><strong>Frequency:</strong> {{ draft.frequency | titlecase }}</p>
-              <p><strong>Language:</strong> {{ draft.language }}</p>
+        <!-- Step 3: Notifications & Control -->
+        <div *ngSwitchCase="2" class="notifications">
+          <h3>Notification Settings</h3>
+          
+          <!-- Global Settings -->
+          <div class="notification-section">
+            <h4>Global Notification Settings</h4>
+            <div class="form-grid">
+              <div class="field toggle span-2">
+                <div>
+                  <p>Enable Email Notifications</p>
+                  <small>Receive notifications via email for all scenarios.</small>
+                </div>
+                <mat-slide-toggle [(ngModel)]="globalEmailEnabled" name="global-email"></mat-slide-toggle>
+              </div>
+
+              <label class="field span-2" *ngIf="globalEmailEnabled">
+                <span>Email Address</span>
+                <input
+                  [(ngModel)]="globalEmail"
+                  name="global-email-input"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  (blur)="updateGlobalNotificationSettings()"
+                />
+              </label>
+
+              <div class="field toggle span-2">
+                <div>
+                  <p>Enable Telegram Notifications</p>
+                  <small>Receive notifications via Telegram for all scenarios.</small>
+                </div>
+                <mat-slide-toggle [(ngModel)]="globalTelegramEnabled" name="global-telegram"></mat-slide-toggle>
+              </div>
+
+              <label class="field span-2" *ngIf="globalTelegramEnabled">
+                <span>Telegram Chat ID</span>
+                <input
+                  [(ngModel)]="globalTelegramChatId"
+                  name="global-telegram-input"
+                  type="text"
+                  placeholder="123456789"
+                  (blur)="updateGlobalNotificationSettings()"
+                />
+              </label>
             </div>
-            <div>
-              <h4>Triggers</h4>
-              <p><strong>Type:</strong> {{ draft.triggerType | titlecase }}</p>
-              <p><strong>Date & Time:</strong> {{ formatDateTimeForDisplay(draft.triggerDateTime) }}</p>
-              <p><strong>Auto Publish:</strong> {{ draft.autoPublish ? 'Enabled' : 'Disabled' }}</p>
+          </div>
+
+          <!-- Per-Scenario Settings -->
+          <div class="notification-section" *ngIf="draft.scenarios && draft.scenarios.length > 0">
+            <h4>Scenario-Specific Notifications</h4>
+            <div class="scenario-notifications">
+              <div *ngFor="let scenario of draft.scenarios; index as i" class="scenario-notification-item">
+                <div class="scenario-notification-header">
+                  <h5>{{ scenario.title }}</h5>
+                  <span class="scenario-date">{{ formatDateTimeForDisplayShort(scenario.videoDateTime) }}</span>
+                </div>
+                <div class="notification-channels">
+                  <div *ngFor="let channelType of notificationChannelTypes" class="notification-channel">
+                    <div class="channel-control">
+                      <mat-checkbox
+                        [checked]="isChannelEnabled(i, channelType)"
+                        (change)="updateNotificationChannel(i, channelType, $event.checked)"
+                        [name]="'channel-' + i + '-' + channelType"
+                      >
+                        {{ channelType | titlecase }}
+                      </mat-checkbox>
+                    </div>
+                    <input
+                      *ngIf="isChannelEnabled(i, channelType)"
+                      type="text"
+                      [placeholder]="getChannelPlaceholder(channelType)"
+                      [value]="getChannelValue(i, channelType)"
+                      (blur)="onChannelValueChange(i, channelType, $any($event.target).value)"
+                      class="channel-input"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="span-2">
-              <h4>Description</h4>
-              <p class="muted">{{ draft.description || 'No description provided yet.' }}</p>
+          </div>
+        </div>
+
+        <!-- Step 4: Sharing & Distribution -->
+        <div *ngSwitchCase="3" class="sharing-distribution">
+          <h3>Select Sharing Platforms</h3>
+          <p class="section-description">Choose where you want to share your videos. You can connect your accounts in Settings.</p>
+
+          <div class="platforms-grid">
+            <div
+              *ngFor="let platform of socialMediaPlatforms"
+              class="platform-card"
+              [class.platform-card--selected]="isPlatformEnabled(platform.key)"
+            >
+              <div class="platform-card__header">
+                <div class="platform-card__icon" [style.background-color]="platform.color">
+                  <mat-icon>{{ platform.icon }}</mat-icon>
+                </div>
+                <div class="platform-card__info">
+                  <h4>{{ platform.name }}</h4>
+                  <small *ngIf="isPlatformEnabled(platform.key) && connectedAccounts.get(platform.key)?.length">
+                    {{ getAccountName(platform.key) }}
+                  </small>
+                  <small *ngIf="isPlatformEnabled(platform.key) && (!connectedAccounts.get(platform.key) || connectedAccounts.get(platform.key)?.length === 0)" class="text-warning">
+                    No account connected
+                  </small>
+                </div>
+              </div>
+              <div class="platform-card__actions">
+                <mat-slide-toggle
+                  [checked]="isPlatformEnabled(platform.key)"
+                  (change)="togglePlatform(platform.key)"
+                  [name]="'platform-' + platform.key"
+                ></mat-slide-toggle>
+              </div>
             </div>
+          </div>
+
+          <div *ngIf="getSelectedPlatformsCount() === 0" class="empty-platforms-note">
+            <mat-icon>info</mat-icon>
+            <p>No platforms selected. Videos will not be automatically shared.</p>
+          </div>
+
+          <div *ngIf="getSelectedPlatformsCount() > 0" class="selected-platforms-summary">
+            <mat-icon>check_circle</mat-icon>
+            <p><strong>{{ getSelectedPlatformsCount() }}</strong> platform{{ getSelectedPlatformsCount() > 1 ? 's' : '' }} selected for sharing</p>
+          </div>
+
+          <div class="settings-link">
+            <mat-icon>settings</mat-icon>
+            <p>Manage your connected accounts in <a href="#" (click)="$event.preventDefault()">Settings</a></p>
           </div>
         </div>
       </ng-container>
@@ -122,21 +341,21 @@
 
       <div class="modal__actions">
         <button type="button" class="btn btn-outline" (click)="handleClose()">Save as Draft</button>
-        <button
-          type="button"
-          class="btn btn-gradient"
-          [disabled]="saving"
-          (click)="isLastStep ? submit() : nextStep()"
-        >
-          <ng-container *ngIf="isLastStep; else nextLabel">
-            <div class="btn-spinner" *ngIf="saving"></div>
-            {{ saving ? (isEditMode ? 'Updating...' : 'Creating...') : submitButtonText }}
-          </ng-container>
-          <ng-template #nextLabel>
-            Next
-            <mat-icon>chevron_right</mat-icon>
-          </ng-template>
-        </button>
+      <button
+        type="button"
+        class="btn btn-gradient"
+        [disabled]="saving || !canProceedToNextStep()"
+        (click)="isLastStep ? submit() : nextStep()"
+      >
+        <ng-container *ngIf="isLastStep; else nextLabel">
+          <div class="btn-spinner" *ngIf="saving"></div>
+          {{ saving ? (isEditMode ? 'Updating...' : 'Creating...') : submitButtonText }}
+        </ng-container>
+        <ng-template #nextLabel>
+          Next
+          <mat-icon>chevron_right</mat-icon>
+        </ng-template>
+      </button>
       </div>
     </footer>
   </div>
