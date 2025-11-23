@@ -36,7 +36,7 @@ import { Observable, catchError, finalize, of, shareReplay, tap } from 'rxjs';
 })
 export class DashboardComponent implements OnInit {
   currentUser$;
-  activeView: DashboardView = 'dashboard';
+  activeView: DashboardView = 'workflows';
   isNewProjectOpen = false;
   editingWorkflow: WorkflowDetail | null = null;
   overview$!: Observable<DashboardOverview | null>;
@@ -95,7 +95,6 @@ export class DashboardComponent implements OnInit {
   }
 
   handleNewWorkflow() {
-    this.activeView = 'dashboard';
     setTimeout(() => {
       this.isNewProjectOpen = true;
     }, 120);

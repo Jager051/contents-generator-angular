@@ -22,8 +22,8 @@ export class SidebarComponent {
   @Output() viewChange = new EventEmitter<DashboardView>();
 
   readonly navItems: NavItem[] = [
-    { id: 'dashboard', icon: 'home', label: 'Dashboard' },
     { id: 'workflows', icon: 'list', label: 'Workflow List' },
+    { id: 'dashboard', icon: 'home', label: 'Dashboard' },
     { id: 'calendar', icon: 'calendar_today', label: 'Calendar' },
     { id: 'history', icon: 'history', label: 'History' },
     { id: 'telegram', icon: 'send', label: 'Telegram' },
