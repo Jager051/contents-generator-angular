@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { NewWorkflowDraft, WorkflowDetail, ScenarioForm, NotificationSettings, NotificationChannel, WorkflowNotificationSettings, SharingPlatform } from '../../dashboard.model';
+import { NewWorkflowDraft, WorkflowDetail, ScenarioForm, NotificationSettings, NotificationChannel, WorkflowNotificationSettings, SharingPlatform, SharingSettings } from '../../dashboard.model';
 
 interface Step {
   title: string;
@@ -183,13 +183,105 @@ export class NewProjectComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['workflow'] && this.workflow) {
       // Edit mode: Load workflow data into draft
+      
+      // Convert backend Scenario[] to ScenarioForm[]
+      const scenarioForms: ScenarioForm[] = [];
+      if (this.workflow.scenarios && this.workflow.scenarios.length > 0) {
+        this.workflow.scenarios.forEach((scenario) => {
+          // Convert ISO date string to datetime-local format
+          const dateTime = scenario.videoDateTime 
+            ? new Date(scenario.videoDateTime).toISOString().slice(0, 16)
+            : this.getDefaultDateTime();
+          
+          scenarioForms.push({
+            title: scenario.title,
+            description: scenario.description || '',
+            videoDateTime: dateTime,
+            hasAudio: scenario.hasAudio !== undefined ? scenario.hasAudio : true,
+            videoType: (scenario.videoType as ScenarioForm['videoType']) || 'normal',
+            isManualDescription: scenario.isManualDescription ?? (!!scenario.description)
+          });
+        });
+      }
+
+      // Load notification settings
+      let notificationSettings: WorkflowNotificationSettings = { scenarios: [] };
+      if (this.workflow.notificationSettings) {
+        // Map scenario IDs to indices for frontend
+        const scenarioIdToIndexMap = new Map<number, number>();
+        if (this.workflow.scenarios && this.workflow.scenarios.length > 0) {
+          this.workflow.scenarios.forEach((scenario, index) => {
+            if (scenario?.id) {
+              scenarioIdToIndexMap.set(scenario.id, index);
+            }
+          });
+        }
+
+        // Convert backend notification settings (using scenario IDs) to frontend format (using indices)
+        const mappedScenarios: NotificationSettings[] = [];
+        if (this.workflow.notificationSettings.scenarios) {
+          this.workflow.notificationSettings.scenarios.forEach((backendNotification) => {
+            const scenarioIndex = scenarioIdToIndexMap.get(backendNotification.scenarioId);
+            if (scenarioIndex !== undefined) {
+              mappedScenarios.push({
+                scenarioId: scenarioIndex, // Use index instead of ID
+                scenarioTitle: backendNotification.scenarioTitle,
+                channels: backendNotification.channels || []
+              });
+            }
+          });
+        }
+
+        notificationSettings = {
+          scenarios: mappedScenarios,
+          globalSettings: this.workflow.notificationSettings.globalSettings
+        };
+        
+        // Set global notification settings
+        if (notificationSettings.globalSettings) {
+          this.globalEmail = notificationSettings.globalSettings.defaultEmail || '';
+          this.globalTelegramChatId = notificationSettings.globalSettings.defaultTelegramChatId || '';
+          this.globalEmailEnabled = notificationSettings.globalSettings.emailEnabled || false;
+          this.globalTelegramEnabled = notificationSettings.globalSettings.telegramEnabled || false;
+        }
+      }
+
+      // Load sharing settings
+      // Initialize all platforms as disabled
+      const allPlatforms: SharingPlatform[] = [
+        { platform: 'instagram', enabled: false },
+        { platform: 'youtube', enabled: false },
+        { platform: 'tiktok', enabled: false },
+        { platform: 'facebook', enabled: false },
+        { platform: 'twitter', enabled: false },
+        { platform: 'linkedin', enabled: false }
+      ];
+
+      // Update enabled platforms from backend
+      if (this.workflow.sharingSettings && this.workflow.sharingSettings.platforms) {
+        this.workflow.sharingSettings.platforms.forEach((backendPlatform) => {
+          const platform = allPlatforms.find(p => p.platform === backendPlatform.platform);
+          if (platform) {
+            platform.enabled = backendPlatform.enabled;
+            platform.accountId = backendPlatform.accountId;
+            platform.accountName = backendPlatform.accountName;
+          }
+        });
+      }
+
+      const sharingSettings: SharingSettings = {
+        platforms: allPlatforms,
+        autoPublish: this.workflow.sharingSettings?.autoPublish
+      };
+
       this.draft = {
         name: this.workflow.name,
         description: this.workflow.description,
         language: this.workflow.language,
         autoPublish: this.workflow.autoPublish,
-        scenarios: this.draft.scenarios || [],
-        notificationSettings: this.draft.notificationSettings || { scenarios: [] }
+        scenarios: scenarioForms,
+        notificationSettings: notificationSettings,
+        sharingSettings: sharingSettings
       };
       this.currentStep = 0; // Reset to first step
     } else if (changes['workflow'] && !this.workflow) {
@@ -200,7 +292,17 @@ export class NewProjectComponent implements OnChanges {
         language: 'English',
         autoPublish: false,
         scenarios: [],
-        notificationSettings: { scenarios: [] }
+        notificationSettings: { scenarios: [] },
+        sharingSettings: {
+          platforms: [
+            { platform: 'instagram', enabled: false },
+            { platform: 'youtube', enabled: false },
+            { platform: 'tiktok', enabled: false },
+            { platform: 'facebook', enabled: false },
+            { platform: 'twitter', enabled: false },
+            { platform: 'linkedin', enabled: false }
+          ]
+        }
       };
       this.resetScenarioForm();
       this.resetNotificationSettings();

@@ -92,11 +92,14 @@ export interface WorkflowDetail {
   name: string;
   description: string;
   status: string;
-  triggerDescription: string;
+  triggerDescription?: string;
   language: string;
   autoPublish: boolean;
   createdAt: string;
   updatedAt?: string | null;
+  scenarios?: Scenario[];
+  notificationSettings?: WorkflowNotificationSettings;
+  sharingSettings?: SharingSettings;
 }
 
 export interface UpdateWorkflowRequest {
@@ -111,10 +114,7 @@ export interface WorkflowListItem {
   id: number;
   name: string;
   status: string; // 'active' | 'paused' | 'error'
-  trigger: string;
-  videosCreated: number;
-  lastRun: string;
-  nextRun: string;
+  scenarioCount: number;
 }
 
 export interface WorkflowListStats {
@@ -130,10 +130,12 @@ export interface WorkflowList {
 }
 
 export interface CalendarWorkflowItem {
-  id: number;
-  name: string;
+  id: number; // Scenario ID
+  workflowId: number;
+  workflowName: string;
+  scenarioTitle: string;
   status: string;
-  nextRunAt: string; // ISO date string
+  videoDateTime: string; // ISO date string
   time: string; // "HH:mm" format
 }
 
@@ -162,6 +164,7 @@ export interface Scenario {
   workflowId?: number;
   hasAudio?: boolean;
   videoType?: 'short' | 'reels' | 'normal' | 'story';
+  isManualDescription?: boolean; // true = user entered manually, false = AI generated
   createdAt?: string;
   updatedAt?: string;
 }

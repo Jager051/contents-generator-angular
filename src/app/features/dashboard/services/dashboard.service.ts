@@ -161,4 +161,25 @@ export class DashboardService {
         })
       );
   }
+
+  deleteWorkflow(workflowId: number): Observable<WorkflowSummary> {
+    return this.http
+      .delete<GenericResponse<WorkflowSummary>>(`${this.WORKFLOWS_URL}/${workflowId}`)
+      .pipe(
+        map((response) => {
+          if (GenericResponseHelper.isSuccess(response)) {
+            const data = GenericResponseHelper.getData(response);
+            if (data) {
+              return data;
+            }
+          }
+
+          throw new Error(GenericResponseHelper.getMessage(response));
+        }),
+        catchError((error) => {
+          const message = error?.error?.message || error?.message || 'Workflow silinemedi';
+          return throwError(() => new Error(message));
+        })
+      );
+  }
 }

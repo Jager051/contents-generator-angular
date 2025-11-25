@@ -201,11 +201,28 @@
 
 .calendar-sidebar__item-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   margin-bottom: 10px;
+}
+
+.calendar-sidebar__item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.calendar-sidebar__scenario-title {
   font-weight: 600;
   color: #1f2937;
+  font-size: 14px;
+}
+
+.calendar-sidebar__workflow-name {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .calendar-sidebar__icon {

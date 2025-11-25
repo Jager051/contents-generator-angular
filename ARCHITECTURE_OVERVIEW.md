@@ -557,3 +557,4 @@ Tüm API response'ları `GenericResponse<T>` formatında:
 **Son Güncelleme**: 2024
 **Versiyon**: 1.0
 
+

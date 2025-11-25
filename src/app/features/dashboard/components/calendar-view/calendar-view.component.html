@@ -68,15 +68,18 @@
         </div>
 
         <!-- Workflows List -->
-        <article *ngFor="let workflow of upcomingWorkflows" class="calendar-sidebar__item">
+        <article *ngFor="let item of upcomingWorkflows" class="calendar-sidebar__item">
           <div class="calendar-sidebar__item-header">
             <div class="calendar-sidebar__icon">
               <mat-icon>play_arrow</mat-icon>
             </div>
-            <span>{{ workflow.name }}</span>
+            <div class="calendar-sidebar__item-content">
+              <span class="calendar-sidebar__scenario-title">{{ item.scenarioTitle }}</span>
+              <span class="calendar-sidebar__workflow-name">{{ item.workflowName }}</span>
+            </div>
           </div>
           <div class="calendar-sidebar__meta">
-            <span>{{ formatDate(workflow.nextRunAt) }} · {{ workflow.time }}</span>
+            <span>{{ formatDate(item.videoDateTime) }} · {{ item.time }}</span>
           </div>
         </article>
 

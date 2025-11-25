@@ -172,8 +172,8 @@ export class WorkflowListComponent implements OnInit, OnDestroy {
     // Call API
     this.dashboardService.updateWorkflowStatus(workflow.id, newStatus).subscribe({
       next: (updatedWorkflow) => {
-        // Update workflow with response data
-        workflow.status = updatedWorkflow.status;
+        // Update workflow with response data (normalize to lowercase)
+        workflow.status = updatedWorkflow.status.toLowerCase();
         // Stats will be updated on next load, but we already did optimistic update
       },
       error: (err) => {
@@ -189,6 +189,55 @@ export class WorkflowListComponent implements OnInit, OnDestroy {
         console.error('Failed to update workflow status:', err);
         // Optionally show error message to user
         this.error = err.message || 'Workflow status güncellenemedi';
+      }
+    });
+  }
+
+  deleteWorkflow(workflow: WorkflowListItem): void {
+    if (!confirm(`"${workflow.name}" workflow'unu silmek istediğinize emin misiniz?`)) {
+      return;
+    }
+
+    // Optimistic update - remove from list immediately
+    const index = this.workflows.findIndex(w => w.id === workflow.id);
+    if (index === -1) {
+      return;
+    }
+
+    const originalWorkflow = { ...workflow };
+    this.workflows.splice(index, 1);
+    
+    // Update stats
+    this.stats.total--;
+    const status = workflow.status.toLowerCase();
+    if (status === 'active') {
+      this.stats.active--;
+    } else if (status === 'paused') {
+      this.stats.paused--;
+    } else if (status === 'error') {
+      this.stats.error--;
+    }
+
+    // Call API
+    this.dashboardService.deleteWorkflow(workflow.id).subscribe({
+      next: () => {
+        // Success - already removed from list
+        this.error = null;
+      },
+      error: (err) => {
+        // Revert optimistic update on error
+        this.workflows.splice(index, 0, originalWorkflow);
+        this.stats.total++;
+        const originalStatus = originalWorkflow.status.toLowerCase();
+        if (originalStatus === 'active') {
+          this.stats.active++;
+        } else if (originalStatus === 'paused') {
+          this.stats.paused++;
+        } else if (originalStatus === 'error') {
+          this.stats.error++;
+        }
+        console.error('Failed to delete workflow:', err);
+        this.error = err.message || 'Workflow silinemedi';
       }
     });
   }
